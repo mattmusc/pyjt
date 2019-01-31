@@ -1,4 +1,5 @@
 import json
+import logging
 
 
 class JsonToolbox():
@@ -18,7 +19,7 @@ class JsonToolbox():
         try:
             data = json.load(json_s)
         except json.decoder.JSONDecodeError as err:
-            print("==> Error: " + err.msg)
+            logging.debug(err)
             return data
 
         return self.process_json(data)

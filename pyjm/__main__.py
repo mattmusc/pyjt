@@ -6,11 +6,12 @@ Main class __main__.py
 @author mattmusc
 """
 import argparse
+import logging
 import os
 import sys
 
 from pyjm.json_toolbox import JsonToolbox
-from .settings import __version__, __progname__
+from .settings import __version__, __progname__, LOGGING_LEVEL
 
 
 def build_args_parser():
@@ -23,13 +24,13 @@ def build_args_parser():
                              dest="file", type=str,
                              help="A JSON file.")
 
-    args_parser.add_argument("--stdin",
-                             dest="stdin", action="store_true", required=False,
-                             help="Read JSON from stdin")
-
     args_parser.add_argument("-k", "--keep",
                              dest="keep",
                              help="List of keys to select from the json - comma separated.")
+
+    args_parser.add_argument("-r", "--remove",
+                             dest="remove",
+                             help="List of keys to ignore from the json - comma separated.")
 
     args_parser.add_argument("-v", "--version",
                              dest="version",
@@ -40,6 +41,7 @@ def build_args_parser():
 
 
 def parse_args_exit(parser):
+    """Parses direct exit arguments"""
     args = parser.parse_args()
 
     if len(sys.argv) < 1:
@@ -51,23 +53,42 @@ def parse_args_exit(parser):
 
 
 def parse_args(parser):
+    """Parse program options"""
     toolbox = JsonToolbox([], [])
 
     args = parser.parse_args()
     if args.keep:
-        toolbox = JsonToolbox(args.keep.split(","), [])
+        toolbox.to_keep = args.keep.split(",")
 
-    if args.stdin:
-        processed = toolbox.process_json_string(sys.stdin)
-    else:
+    if args.remove:
+        toolbox.to_remove = args.remove.split(",")
+
+    if args.file:
         filepath = os.path.abspath(args.file)
         processed = toolbox.process_json_file(filepath)
 
+    else:
+        processed = toolbox.process_json_string(sys.stdin)
+
     print(processed)
+    print()
+
+
+def setup_logging():
+    logging.basicConfig(format=("[%(levelname)s\033[0m] "
+                                "\033[1;31m%(module)s\033[0m: "
+                                "%(message)s"),
+                        level=LOGGING_LEVEL,
+                        stream=sys.stdout)
+    logging.addLevelName(logging.ERROR, '\033[1;31mE')
+    logging.addLevelName(logging.INFO, '\033[1;32mI')
+    logging.addLevelName(logging.WARNING, '\033[1;33mW')
 
 
 def main():
     """ Main method """
+    setup_logging()
+
     parser = build_args_parser()
 
     parse_args_exit(parser)
