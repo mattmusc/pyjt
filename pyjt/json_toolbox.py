@@ -37,6 +37,6 @@ class JsonToolbox():
             return {k: json_data[k] for k in keys}
 
         if type(data) == type([]):
-            return list(map(lambda j: process(j), data))
+            return json.dumps(list(map(lambda j: process(j), data)), sort_keys=True)
 
-        return process(data)
+        return json.dumps(process(data), sort_keys=True)
