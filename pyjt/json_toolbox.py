@@ -25,12 +25,18 @@ class JsonToolbox():
         return self.process_json(data)
 
     def process_json(self, data):
-        keys = data.keys()
+        def process(json_data):
+            keys = json_data.keys()
 
-        if len(self.to_keep) > 0:
-            keys = list(filter(lambda k: k in self.to_keep, keys))
+            if len(self.to_keep) > 0:
+                keys = list(filter(lambda k: k in self.to_keep, keys))
 
-        if len(self.to_remove) > 0:
-            keys = list(filter(lambda k: k not in self.to_remove, keys))
+            if len(self.to_remove) > 0:
+                keys = list(filter(lambda k: k not in self.to_remove, keys))
 
-        return {k: data[k] for k in keys}
+            return {k: json_data[k] for k in keys}
+
+        if type(data) == type([]):
+            return list(map(lambda j: process(j), data))
+
+        return process(data)

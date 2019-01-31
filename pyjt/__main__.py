@@ -1,5 +1,5 @@
 """
-PYJM
+PYJT
 
 Main class __main__.py
 
@@ -10,7 +10,7 @@ import logging
 import os
 import sys
 
-from pyjm.json_toolbox import JsonToolbox
+from pyjt.json_toolbox import JsonToolbox
 from .settings import __version__, __progname__, LOGGING_LEVEL
 
 
