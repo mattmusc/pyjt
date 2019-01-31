@@ -8,10 +8,22 @@ class JsonToolbox():
         self.to_keep = to_keep
         self.to_remove = to_remove
 
-    def process_json(self, filename):
+    def process_json_file(self, filename):
         with open(filename, 'r') as json_f:
             data = json.load(json_f)
+        return self.process_json(data)
 
+    def process_json_string(self, json_s):
+        data = ""
+        try:
+            data = json.load(json_s)
+        except json.decoder.JSONDecodeError as err:
+            print("==> Error: " + err.msg)
+            return data
+
+        return self.process_json(data)
+
+    def process_json(self, data):
         keys = data.keys()
 
         if len(self.to_keep) > 0:

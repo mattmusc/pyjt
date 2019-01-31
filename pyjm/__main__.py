@@ -19,12 +19,21 @@ def build_args_parser():
 
     args_parser = argparse.ArgumentParser(prog=__progname__, description=description)
 
-    args_parser.add_argument("file", type=str, help="A JSON file.")
+    args_parser.add_argument("-f", "--file",
+                             dest="file", type=str,
+                             help="A JSON file.")
+
+    args_parser.add_argument("--stdin",
+                             dest="stdin", action="store_true", required=False,
+                             help="Read JSON from stdin")
 
     args_parser.add_argument("-k", "--keep",
+                             dest="keep",
                              help="List of keys to select from the json - comma separated.")
 
-    args_parser.add_argument("-v", "--version", action="store_true",
+    args_parser.add_argument("-v", "--version",
+                             dest="version",
+                             action="store_true",
                              help=f"Print \"{__progname__}\" version.")
 
     return args_parser
@@ -48,8 +57,13 @@ def parse_args(parser):
     if args.keep:
         toolbox = JsonToolbox(args.keep.split(","), [])
 
-    filepath = os.path.abspath(args.file)
-    print(toolbox.process_json(filepath))
+    if args.stdin:
+        processed = toolbox.process_json_string(sys.stdin)
+    else:
+        filepath = os.path.abspath(args.file)
+        processed = toolbox.process_json_file(filepath)
+
+    print(processed)
 
 
 def main():
